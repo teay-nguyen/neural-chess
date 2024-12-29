@@ -1,13 +1,16 @@
-#!/usr/bin/env python3.11
+#!/usr/bin/env python
 from position import Position
 import chess.pgn
 import os, sys
 import numpy as np
 
+# pooling doesn't work
+# its writing more to the array than recorded
+
 def get_dataset(num_samples=None):
   gn = 0
   X, Y = [], []
-  vals = {'1/2-1/2':0.5, '0-1':0, '1-0':1}
+  vals = {'1/2-1/2':0, '0-1':-1, '1-0':1}
   for pgn in os.listdir('data'):
     pgn_fp = os.path.join('data', pgn)
     with open(pgn_fp) as games:
@@ -27,11 +30,9 @@ def get_dataset(num_samples=None):
         print('parsed game %d, got %d samples' % (gn, len(X)))
         if num_samples is not None and len(X) > num_samples: break
         gn += 1
-  X = np.array(X)
-  Y = np.array(Y)
-  return X, Y
+  return np.array(X), np.array(Y)
 
 if __name__ == '__main__':
-  X, Y = get_dataset(1000000)
+  X, Y = get_dataset(100000)
   print(f'X {X.shape} Y {Y.shape}')
-  np.savez('processed/dataset_1M.npz', X, Y)
+  np.savez('processed/dataset_100K.npz', X, Y)
